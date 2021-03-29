@@ -1,0 +1,7 @@
+server:
+  port: 6060
+
+spring:
+  redis:
+    host: 8.140.153.233
+    port: 6379
