@@ -1,0 +1,4 @@
+# Project exclude paths
+/jelly-common/target/
+/jelly-core/target/
+/jelly-monitor/target/

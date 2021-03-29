@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.qyl</groupId>
+  <artifactId>JellyLimiter</artifactId>
+  <packaging>pom</packaging>
+  <version>1.0.0.RELEASE</version>
+  <modules>
+    <module>jelly-common</module>
+    <module>jelly-core</module>
+    <module>jelly-monitor</module>
+  </modules>
+
+  <name>JellyLimiter</name>
+  <description>A monolithic/distributed rate limiter component base on token bucket algorithm</description>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
+    <java.version>11</java.version>
+    <jelly.limiter.version>1.0.0.RELEASE</jelly.limiter.version>
+    <lombok.version>1.18.16</lombok.version>
+  </properties>
+
+  <dependencies>
+    <!--lombok-->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>${lombok.version}</version>
+    </dependency>
+    <!--slf4j-->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.26</version>
+    </dependency>
+    <!--logback-->
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.2.3</version>
+    </dependency>
+  </dependencies>
+</project>
