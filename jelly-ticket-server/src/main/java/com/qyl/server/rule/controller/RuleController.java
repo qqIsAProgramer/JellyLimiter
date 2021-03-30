@@ -32,7 +32,6 @@ public class RuleController {
     public String heartbeat(@RequestParam("data") String rule) {
         logger.info("heartbeat for the rule: " + rule);
         LimiterRule limiterRule = JSON.parseObject(rule, LimiterRule.class);
-        System.out.println(JSON.toJSONString(limiterRule));
         return JSON.toJSONString(ruleService.heartbeat(limiterRule));
     }
 
