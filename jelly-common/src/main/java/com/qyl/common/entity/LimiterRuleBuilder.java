@@ -24,7 +24,7 @@ public class LimiterRuleBuilder {
      * 设置 app name
      */
     public LimiterRuleBuilder setApp(String app) {
-        this.limiterRule.setApp(app);
+        this.limiterRule.setName(app);
         return this;
     }
     /**
@@ -51,7 +51,7 @@ public class LimiterRuleBuilder {
     /**
      * 时间单位
      */
-    public LimiterRuleBuilder setTimeUnit(TimeUnit unit) {
+    public LimiterRuleBuilder setUnit(TimeUnit unit) {
         this.limiterRule.setUnit(unit);
         return this;
     }

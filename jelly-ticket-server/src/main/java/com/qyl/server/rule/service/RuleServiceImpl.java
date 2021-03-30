@@ -40,14 +40,12 @@ public class RuleServiceImpl implements RuleService {
 
     private Map<String, ScheduledFuture<?>> taskMap = new ConcurrentHashMap<>();
 
-    private String uid = UUID.randomUUID().toString();
-
     @Override
     public LimiterRule heartbeat(LimiterRule limiterRule) {
         // 1. 读取最新的规则
         LimiterRule newRule = readNewestRule(limiterRule);
         // 2. 标记实例装况
-        stringRedisTemplate.opsForValue().set(RedisKey.getInstanceKey(newRule), RedisKey.INSTANCE, 5, TimeUnit.SECONDS);
+        stringRedisTemplate.opsForValue().set(RedisKey.getInstanceKey(newRule), RedisKey.INSTANCE, 10, TimeUnit.SECONDS);
         // 3. 实时更新实例状况
         updateInstanceNumber(newRule);
         // 4. 检查令牌桶状况
@@ -62,14 +60,14 @@ public class RuleServiceImpl implements RuleService {
         String rule = stringRedisTemplate.opsForValue().get(RedisKey.getLimiterRuleKey(limiterRule));
         if (StringUtils.isEmpty(rule)) {
             // 添加规则
-            stringRedisTemplate.opsForValue().set(RedisKey.getLimiterRuleKey(limiterRule), JSON.toJSONString(limiterRule), 5, TimeUnit.SECONDS);
+            stringRedisTemplate.opsForValue().set(RedisKey.getLimiterRuleKey(limiterRule), JSON.toJSONString(limiterRule), 10, TimeUnit.SECONDS);
         } else {
             // 规则延时
-            stringRedisTemplate.expire(RedisKey.getLimiterRuleKey(limiterRule), 5, TimeUnit.SECONDS);
+            stringRedisTemplate.expire(RedisKey.getLimiterRuleKey(limiterRule), 10, TimeUnit.SECONDS);
             // 读取最新
             LimiterRule cacheRule = JSON.parseObject(rule, LimiterRule.class);
             if (cacheRule.getVersion() > limiterRule.getVersion()) {
-                cacheRule.setName(limiterRule.getName());
+                cacheRule.setLimitName(limiterRule.getLimitName());
                 return cacheRule;
             }
         }
@@ -101,7 +99,7 @@ public class RuleServiceImpl implements RuleService {
         }
         // 执行任务
         ScheduledFuture<?> scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(() -> {
-            String rule = stringRedisTemplate.opsForValue().get(newRule);
+            String rule = stringRedisTemplate.opsForValue().get(RedisKey.getLimiterRuleKey(newRule));
             if (StringUtils.isEmpty(rule)) {
                 logger.debug("Task cancel: " + RedisKey.getLimiterRuleKey(newRule));
                 taskMap.get(RedisKey.getBucketKey(newRule)).cancel(true);
@@ -109,12 +107,10 @@ public class RuleServiceImpl implements RuleService {
                 return;
             }
             String value = stringRedisTemplate.opsForValue().get(RedisKey.getBucketKey(newRule));
-            if (value != null) {
-                long token = Long.parseLong(value);
-                long add = Math.min(newRule.getCapacity() - token, newRule.getTokenRate());
-                if (token < newRule.getCapacity()) {
-                    stringRedisTemplate.opsForValue().increment(RedisKey.getBucketKey(newRule), add);
-                }
+            long token = value == null ? 0 : Long.parseLong(value);
+            if (token < newRule.getCapacity()) {
+                long delta = Math.min(newRule.getCapacity() - token, newRule.getTokenRate());
+                stringRedisTemplate.opsForValue().increment(RedisKey.getBucketKey(newRule), delta);
             }
         }, 0, newRule.getPeriod(), newRule.getUnit());
         taskMap.put(RedisKey.getBucketKey(newRule), scheduledFuture);

@@ -26,6 +26,12 @@
             <version>${jelly.limiter.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.qyl</groupId>
+            <artifactId>jelly-core</artifactId>
+            <version>1.0.0.RELEASE</version>
+        </dependency>
+
         <!--redisson-->
         <dependency>
             <groupId>org.redisson</groupId>

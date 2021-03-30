@@ -12,21 +12,20 @@ public class RedisKey {
     private static final String RULE = "$RULE$";  // 规则前缀
     private static final String LOCK = "$LOCK$";  // 锁前缀
     private static final String BUCKET = "$BUCKET$";  // 令牌桶前缀
-    private static final String BUCKET_PRINCIPAL = "$BUCKET_PRINCIPAL$";  // 令牌桶负责的线程
 
-    public static String getInstanceKey(LimiterRule rateLimiterRule) {
+    public static String getInstanceKey(LimiterRule limiterRule) {
         // 获取单个实例的 key
-        return INSTANCE + rateLimiterRule.getApp() + rateLimiterRule.getId() + rateLimiterRule.getName();
+        return INSTANCE + limiterRule.getApp() + limiterRule.getId() + limiterRule.getName();
     }
 
-    public static String getInstanceKeys(LimiterRule rateLimiterRule) {
+    public static String getInstanceKeys(LimiterRule limiterRule) {
         // 获取所有实例的 key
-        return INSTANCE + rateLimiterRule.getApp() + rateLimiterRule.getId() + "*";
+        return INSTANCE + limiterRule.getApp() + limiterRule.getId() + "*";
     }
 
-    public static String getLimiterRuleKey(LimiterRule rateLimiterRule) {
+    public static String getLimiterRuleKey(LimiterRule limiterRule) {
         // 获取单个规则的 key
-        return RULE + rateLimiterRule.getApp() + rateLimiterRule.getId();
+        return RULE + limiterRule.getApp() + limiterRule.getId();
     }
 
     public static String getLimiterRuleKeys(String app, String id) {
@@ -43,18 +42,13 @@ public class RedisKey {
         return RULE + builder.toString();
     }
 
-    public static String getLockKey(LimiterRule rateLimiterRule) {
+    public static String getLockKey(LimiterRule limiterRule) {
         // 获取锁的 key
-        return LOCK + rateLimiterRule.getApp() + rateLimiterRule.getId();
+        return LOCK + limiterRule.getApp() + limiterRule.getId();
     }
 
-    public static String getBucketKey(LimiterRule rateLimiterRule) {
+    public static String getBucketKey(LimiterRule limiterRule) {
         // 获取令牌桶的 key
-        return BUCKET + rateLimiterRule.getApp() + rateLimiterRule.getId();
-    }
-
-    public static String getBucketPrincipalKey(LimiterRule rateLimiterRule) {
-        // 获取负责一个令牌桶的线程的 key
-        return BUCKET_PRINCIPAL + rateLimiterRule.getApp() + rateLimiterRule.getId();
+        return BUCKET + limiterRule.getApp() + limiterRule.getId();
     }
 }
