@@ -12,6 +12,7 @@
     <module>jelly-common</module>
     <module>jelly-core</module>
     <module>jelly-ticket-server</module>
+      <module>jelly-spring-boot-starter</module>
   </modules>
 
   <name>JellyLimiter</name>

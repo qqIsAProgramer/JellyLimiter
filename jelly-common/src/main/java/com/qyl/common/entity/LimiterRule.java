@@ -22,7 +22,7 @@ public class LimiterRule implements Comparable<LimiterRule>, Serializable {
      */
     private String app = "application";
     /**
-     * 限流规则名称（对应 @RateLimiter(value = "${id}")）
+     * 限流规则名称（对应 @RateLimiter(id = "${id}")）
      */
     private String id = "id";
     /**

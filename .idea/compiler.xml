@@ -7,9 +7,10 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="jelly-common" />
         <module name="jelly-ticket-server" />
         <module name="jelly-core" />
-        <module name="jelly-common" />
+        <module name="jelly-spring-boot-starter" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="11">
@@ -18,6 +19,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="jelly-spring-boot-starter" options="-parameters" />
       <module name="jelly-ticket-server" options="-parameters" />
     </option>
   </component>

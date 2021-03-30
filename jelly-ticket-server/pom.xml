@@ -29,7 +29,8 @@
         <dependency>
             <groupId>com.qyl</groupId>
             <artifactId>jelly-core</artifactId>
-            <version>1.0.0.RELEASE</version>
+            <version>${jelly.limiter.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!--redisson-->
