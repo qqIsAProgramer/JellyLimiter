@@ -22,8 +22,8 @@ public class CommonTest {
     public void test1() throws InterruptedException {
         // 1. 限流配置
         LimiterRule limiterRule = new LimiterRuleBuilder(15)
-                .setApp("demo_project")
-                .setId("jelly_limiter")
+                .setApp("demo")
+                .setId("jelly")
                 .setTokenRate(3)  // 每秒 3 个令牌
                 .setLimiterModel(LimiterModel.DISTRIBUTE)  // 分布式限流，需启动 TicketServer 控制台
                 .build();

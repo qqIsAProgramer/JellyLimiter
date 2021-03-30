@@ -5,6 +5,7 @@ import com.qyl.common.enums.LimiterModel;
 import com.qyl.common.enums.RuleAuthority;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -14,7 +15,7 @@ import java.util.concurrent.TimeUnit;
  * @Date: 2021/3/28 21:09
  */
 @Data
-public class LimiterRule implements Comparable<LimiterRule> {
+public class LimiterRule implements Comparable<LimiterRule>, Serializable {
     // Application related
     /**
      * 项目应用名称（默认 application）
@@ -80,6 +81,10 @@ public class LimiterRule implements Comparable<LimiterRule> {
      * 版本号（不需要用户配置）
      */
     private int version;
+
+    public LimiterRule() {
+        // 一定要加，否则 json 解析不出
+    }
 
     public LimiterRule(long capacity) {
         this.capacity = capacity;
