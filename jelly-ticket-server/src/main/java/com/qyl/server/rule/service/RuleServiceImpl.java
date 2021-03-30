@@ -67,7 +67,7 @@ public class RuleServiceImpl implements RuleService {
             // 读取最新
             LimiterRule cacheRule = JSON.parseObject(rule, LimiterRule.class);
             if (cacheRule.getVersion() > limiterRule.getVersion()) {
-                cacheRule.setLimitName(limiterRule.getLimitName());
+                cacheRule.setName(limiterRule.getName());
                 return cacheRule;
             }
         }
