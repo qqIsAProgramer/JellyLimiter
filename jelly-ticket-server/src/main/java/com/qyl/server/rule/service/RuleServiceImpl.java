@@ -51,7 +51,7 @@ public class RuleServiceImpl implements RuleService {
         // 3. 实时更新实例状况
         updateInstanceNumber(newRule);
         // 4. 检查令牌桶状况
-        checkAndPutToken(newRule, limiterRule);
+        putToken(newRule, limiterRule);
         return newRule;
     }
 
@@ -87,10 +87,37 @@ public class RuleServiceImpl implements RuleService {
     }
 
     /**
-     * 检查令牌桶状况以及放入令牌
+     * 执行存放令牌的任务
      */
-    private void checkAndPutToken(LimiterRule newRule, LimiterRule oldRule) {
-
+    private void putToken(LimiterRule newRule, LimiterRule oldRule) {
+        // 分配向桶里存放令牌的任务
+        if (taskMap.containsKey(RedisKey.getBucketKey(newRule))) {
+            if (newRule.getVersion() > oldRule.getVersion()) {
+                ScheduledFuture<?> scheduledFuture = taskMap.get(RedisKey.getBucketKey(newRule));
+                scheduledFuture.cancel(true);
+            } else {
+                return;
+            }
+        }
+        // 执行任务
+        ScheduledFuture<?> scheduledFuture = scheduledExecutorService.scheduleAtFixedRate(() -> {
+            String rule = stringRedisTemplate.opsForValue().get(newRule);
+            if (StringUtils.isEmpty(rule)) {
+                logger.debug("Task cancel: " + RedisKey.getLimiterRuleKey(newRule));
+                taskMap.get(RedisKey.getBucketKey(newRule)).cancel(true);
+                taskMap.remove(RedisKey.getBucketKey(newRule));
+                return;
+            }
+            String value = stringRedisTemplate.opsForValue().get(RedisKey.getBucketKey(newRule));
+            if (value != null) {
+                long token = Long.parseLong(value);
+                long add = Math.min(newRule.getCapacity() - token, newRule.getTokenRate());
+                if (token < newRule.getCapacity()) {
+                    stringRedisTemplate.opsForValue().increment(RedisKey.getBucketKey(newRule), add);
+                }
+            }
+        }, 0, newRule.getPeriod(), newRule.getUnit());
+        taskMap.put(RedisKey.getBucketKey(newRule), scheduledFuture);
     }
 
     @Override
@@ -128,7 +155,7 @@ public class RuleServiceImpl implements RuleService {
                 .forEach(ruleKey -> {
                     String rule = stringRedisTemplate.opsForValue().get(ruleKey);
                     LimiterRule limiterRule = JSON.parseObject(rule, LimiterRule.class);
-                    updateInstanceNumber(limiterRule);  // 为啥要更新呢...
+                    updateInstanceNumber(limiterRule);  // 为啥要更新呢...?
                     list.add(limiterRule);
                 });
         return ResponseResult.ok(list);
