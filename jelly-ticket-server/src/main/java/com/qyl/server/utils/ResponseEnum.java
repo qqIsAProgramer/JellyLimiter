@@ -10,6 +10,7 @@ public enum ResponseEnum {
 
     ILLEGAL_ARGS(1001, "参数不合法"),
     NULL_ARGS(1002, "参数为空"),
+    NULL_RESULT(1003, "结果为空");
     ;
 
     /**

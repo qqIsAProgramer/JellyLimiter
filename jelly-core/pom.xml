@@ -19,12 +19,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.qyl</groupId>
-            <artifactId>jelly-monitor</artifactId>
-            <version>${jelly.limiter.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.13.1</version>

@@ -1,16 +1,13 @@
 package com.qyl.core.limiter;
 
+import com.alibaba.fastjson.JSON;
 import com.qyl.common.entity.LimiterRule;
 import com.qyl.common.enums.LimiterModel;
+import com.qyl.common.utils.ServerAddress;
 import com.qyl.core.config.LimiterConfig;
-import com.qyl.core.monitor.MonitorClientImpl;
-import com.qyl.monitor.client.MonitorClient;
-import com.qyl.monitor.entity.Monitor;
 
-import java.time.LocalDateTime;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Stream;
 
 /**
  * @Author: qyl
@@ -29,16 +26,9 @@ public class RateLimiterDefault implements RateLimiter {
 
     private ScheduledFuture<?> scheduledFuture;
 
-    private MonitorClient monitorClient = new MonitorClientImpl();
-
     public RateLimiterDefault(LimiterRule rule, LimiterConfig config) {
         this.config = config;
         init(rule);
-    }
-
-    @Override
-    public MonitorClient getMonitorClient() {
-        return this.monitorClient;
     }
 
     @Override
@@ -54,7 +44,7 @@ public class RateLimiterDefault implements RateLimiter {
             // 未开启限流
             return false;
         }
-        return tryAcquireMonitor();
+        return tryAcquirePut();
     }
 
     @Override
@@ -65,33 +55,12 @@ public class RateLimiterDefault implements RateLimiter {
                 allow = rule.getLimitUserList().contains(user);
                 break;
             case AUTHORITY_BLACK:
-                allow = Stream.of(rule.getLimitUserList()).noneMatch(o -> o.equals(user));
+                allow = !rule.getLimitUserList().contains(user);
                 break;
             default:
                 allow = true;
         }
         return allow && tryAcquire();
-    }
-
-    /**
-     * 限流器监控
-     */
-    private boolean tryAcquireMonitor() {
-        if (rule.getLimiterModel() == LimiterModel.MONOLITHIC) {
-            // 本地限流不支持监控
-            return tryAcquirePut();
-        }
-        // 对分布式限流器进行监控
-        Monitor monitor = new Monitor();
-        monitor.setLocalDateTime(LocalDateTime.now());
-        monitor.setApp(rule.getApp());
-        monitor.setId(rule.getId());
-        monitor.setName(rule.getName());
-        monitor.setMonitorTime(rule.getMonitorTime());
-        config.getScheduledExecutorService().execute(() -> {
-            monitorClient.save(monitor);
-        });
-        return tryAcquirePut();
     }
 
     private boolean tryAcquirePut() {
@@ -118,7 +87,6 @@ public class RateLimiterDefault implements RateLimiter {
                 break;
             default:
                 result = false;
-                break;
         }
         return result;
     }
@@ -128,7 +96,7 @@ public class RateLimiterDefault implements RateLimiter {
      */
     private boolean tryAcquireFailed() {
         long token = bucket.longValue();
-        while (token >= 1) {
+        while (token > 0) {
             if (bucket.compareAndSet(token, token - 1)) {
                 return true;
             }
@@ -142,7 +110,7 @@ public class RateLimiterDefault implements RateLimiter {
      */
     private boolean tryAcquireSucceed() {
         long token = bucket.longValue();
-        while (!(token >= 1 && bucket.compareAndSet(token, token - 1))) {
+        while (!(token > 0 && bucket.compareAndSet(token, token - 1))) {
             sleep();
             token = bucket.longValue();
         }
@@ -196,9 +164,11 @@ public class RateLimiterDefault implements RateLimiter {
             if (bucket.get() < rule.getCapacity()) {
                 synchronized (this) {
                     if (bucket.get() < rule.getCapacity()) {
-                        // TODO
-                        long lost = rule.getCapacity() - bucket.get();
-                        bucket.getAndAdd(Math.min(lost, rule.getTokenRate()));
+                        // 一个限流器只能有一个桶，这个桶用 Redis 来存储
+                        String token = config.getTicketServer().connect(ServerAddress.TOKEN_PATH, JSON.toJSONString(rule));
+                        if (token != null) {
+                            bucket.getAndAdd(Long.parseLong(token));
+                        }
                     }
                 }
             }

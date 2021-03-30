@@ -1,15 +1,12 @@
 package com.qyl.core.limiter;
 
 import com.qyl.common.entity.LimiterRule;
-import com.qyl.monitor.client.MonitorClient;
 
 /**
  * @Author: qyl
  * @Date: 2021/3/28 23:25
  */
 public interface RateLimiter {
-
-    MonitorClient getMonitorClient();
 
     void init(LimiterRule rule);
 

@@ -54,12 +54,6 @@ public class LimiterRule implements Comparable<LimiterRule> {
      */
     private long capacity;
 
-    // Monitor related
-    /**
-     * 监控时长（默认为 10s）
-     */
-    private long monitorTime = 10;
-
     // Enums related
     /**
      * 限流器模型：单体式/分布式（默认单体式）

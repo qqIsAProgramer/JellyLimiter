@@ -11,7 +11,6 @@
   <modules>
     <module>jelly-common</module>
     <module>jelly-core</module>
-    <module>jelly-monitor</module>
     <module>jelly-ticket-server</module>
   </modules>
 

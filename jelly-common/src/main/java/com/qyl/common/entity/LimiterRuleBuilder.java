@@ -56,13 +56,6 @@ public class LimiterRuleBuilder {
         return this;
     }
     /**
-     * 监控时长（秒），0为关闭
-     */
-    public LimiterRuleBuilder setMonitorTime(long monitor) {
-        this.limiterRule.setMonitorTime(monitor);
-        return this;
-    }
-    /**
      * 黑白名单列表
      */
     public LimiterRuleBuilder setLimitUserList(List<String> limitUserList) {
@@ -104,6 +97,5 @@ public class LimiterRuleBuilder {
         assert limiterRule.getCapacity() > 0;
         assert limiterRule.getTokenRate() >= 0;
         assert limiterRule.getPeriod() >= 0;
-        assert limiterRule.getMonitorTime() >= 0;
     }
 }
