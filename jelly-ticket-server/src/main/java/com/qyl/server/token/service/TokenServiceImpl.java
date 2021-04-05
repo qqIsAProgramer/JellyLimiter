@@ -32,9 +32,9 @@ public class TokenServiceImpl implements TokenService {
         if (Long.parseLong(value) > 0) {
             redisLock.acquire(RedisKey.getLockKey(limiterRule));
             value = stringRedisTemplate.opsForValue().get(RedisKey.getBucketKey(limiterRule));
+            long result = 0L;
             if (!StringUtils.isEmpty(value)) {
                 long token = Long.parseLong(value);
-                long result;
                 if (token <= 0) {
                     result = 0L;
                 } else if (token >= limiterRule.getTokenRate()) {
@@ -44,9 +44,9 @@ public class TokenServiceImpl implements TokenService {
                     stringRedisTemplate.opsForValue().decrement(RedisKey.getBucketKey(limiterRule), token);
                     result = token;
                 }
-                return result;
             }
             redisLock.release(RedisKey.getLockKey(limiterRule));
+            return result;
         }
         return 0L;
     }

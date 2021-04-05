@@ -24,7 +24,7 @@ public class LimiterRuleBuilder {
      * 设置 app name
      */
     public LimiterRuleBuilder setApp(String app) {
-        this.limiterRule.setName(app);
+        this.limiterRule.setApp(app);
         return this;
     }
     /**

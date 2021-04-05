@@ -160,16 +160,11 @@ public class RateLimiterDefault implements RateLimiter {
         }
         // 异步任务
         config.getScheduledExecutorService().execute(() -> {
-            // DCL 再次检验
             if (bucket.get() < rule.getCapacity()) {
-                synchronized (this) {
-                    if (bucket.get() < rule.getCapacity()) {
-                        // 一个限流器只能有一个桶，这个桶用 Redis 来存储
-                        String token = config.getTicketServer().connect(ServerAddress.TOKEN_PATH, JSON.toJSONString(rule));
-                        if (token != null) {
-                            bucket.getAndAdd(Long.parseLong(token));
-                        }
-                    }
+                // 一个限流器只能有一个桶，这个桶用 Redis 来存储
+                String token = config.getTicketServer().connect(ServerAddress.TOKEN_PATH, JSON.toJSONString(rule));
+                if (token != null) {
+                    bucket.getAndAdd(Long.parseLong(token));
                 }
             }
         });

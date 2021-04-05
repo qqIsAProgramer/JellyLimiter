@@ -28,8 +28,6 @@ public class CommonTest {
                 .setLimiterModel(LimiterModel.DISTRIBUTE)  // 分布式限流，需启动 TicketServer 控制台
                 .build();
 
-//        System.out.println(JSON.toJSONString(limiterRule));
-
         // 2. 配置 TicketServer 地址（支持集群、加权重）
         Map<String, Integer> ticketServer = new HashMap<>();
         ticketServer.put("127.0.0.1:6060", 1);
@@ -43,6 +41,7 @@ public class CommonTest {
             if (limiter.tryAcquire()) {
                 System.out.println("ok");
             }
+
             Thread.sleep(10);
         }
     }
