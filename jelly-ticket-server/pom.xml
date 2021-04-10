@@ -20,6 +20,13 @@
 
 
     <dependencies>
+        <!--zk-->
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-recipes</artifactId>
+            <version>4.2.0</version>
+        </dependency>
+
         <dependency>
             <groupId>com.qyl</groupId>
             <artifactId>jelly-common</artifactId>
