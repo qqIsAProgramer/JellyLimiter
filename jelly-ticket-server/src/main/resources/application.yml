@@ -3,5 +3,5 @@ server:
 
 spring:
   redis:
-    host: 114.215.197.62
+    host: localhost
     port: 6379
